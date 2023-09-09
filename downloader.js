@@ -34,6 +34,9 @@ function getRandomPokemonId(){
 // Retrieve Pokemon data for that number
 // Retrieve the image URL from that Pokemon data
 async function getPokemonPictureUrl(targetId = getRandomPokemonId()){
+
+  // Retrieve the API data
+  // Make the web request
   let response = await fetch("https://pokeapi.co/api/v2/pokemon/" + targetId).catch(error => {
     throw new Error("API failure.");
   });
@@ -42,6 +45,7 @@ async function getPokemonPictureUrl(targetId = getRandomPokemonId()){
     throw new Error("API did not have data for the requested ID.");
   }
 
+  // Obtain Json data
   // Convert the response into usable JSON
   let data = await response.json().catch(error => {
     throw new Error("API did not return valid JSON.");
@@ -60,7 +64,35 @@ async function getPokemonPictureUrl(targetId = getRandomPokemonId()){
 // Download that image and save it to the computer
 // Return the downloaded image's file path
 async function savePokemonPictureToDisk(targetUrl, targetDownloadFilename, targetDownloadDirectory = "."){
+  // Fetch request to image URL
+  // Make a request specifically to the URL
+  let imageData = await fetch(targetUrl).catch((error) => {
+    throw new Error("Image failed to download.");
+  });
 
+  // Check if target directory exists
+  if (!fs.existsSync(targetDownloadDirectory)){
+    // Make a directory if we need to 
+    await mkdir(targetDownloadDirectory, targetDownloadFilename);
+  }
+
+  // Create a JS-friendly file path
+  let fullFileDestination = path.join(targetDownloadDirectory, targetDownloadFilename);
+  // someFolder, CoolPokemon.png
+  // /someFolder/CoolPokemon.png
+  // \someFolder\CoolPokemon.png
+
+  // Stream the image from the fetch to the computer
+  // And saving it to the computer
+  let fileDownloadStream = fs.createWriteStream(fullFillDestination);
+
+  // get data as bytes from the web request ... pipe the bytes into the hard drive
+  await finished(Readable.fromWeb(imageData.body)).pip(fileDownloadStream).catch(error => {
+    throw new Error("Failed to save content to disk.");
+  });
+
+  // Return the saved image location
+  return fullFileDestination;
 }
 
 
