@@ -34,6 +34,25 @@ function getRandomPokemonId(){
 // Retrieve Pokemon data for that number
 // Retrieve the image URL from that Pokemon data
 async function getPokemonPictureUrl(targetId = getRandomPokemonId()){
+  let response = await fetch("https://pokeapi.co/api/v2/pokemon/" + targetId).catch(error => {
+    throw new Error("API failure.");
+  });
+
+  if (response.status == "404") {
+    throw new Error("API did not have data for the requested ID.");
+  }
+
+  // Convert the response into usable JSON
+  let data = await response.json().catch(error => {
+    throw new Error("API did not return valid JSON.");
+  })
+
+  // let imageUrl = data.sprites.other["official-artwork"].front_default;
+  // return imageUrl
+  // not memory efficient, not optimized. It makes unnecessary variables
+
+  // More-optimised, no extra junk variables
+  return data.sprites.other["official-artwork"].front_default;
 
 }
 
