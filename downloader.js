@@ -18,11 +18,29 @@ const {finished} = require("node:stream/promises");
 // Node file & directory path helper system
 // /folder/folder.filename.png
 // \folder\folder\filename.png
-const path = downloader
+const path = require("node:path");
 
 
 function downloadPokemonPicture(targetId = getRandomPokemonId()){
+  return new Promise(async (resolve, reject) => {
 
+    try {
+
+      // Step 1: get the image URL 
+			let newUrl = await getPokemonPictureUrl(targetId); 
+
+			// Step 2: do the download 
+			let savedFileLocation = await savePokemonPictureToDisk(newUrl, "ExampleImage.png", "storage");
+
+			// return savedFileLocation;
+			resolve(savedFileLocation);
+
+
+    } catch (error) {
+        reject(error);
+    }
+
+  });
 }
 
 // Generate a random number or use a user-provided number
